@@ -1,6 +1,9 @@
 import serial
+import logging
 
 gps = serial.Serial("/dev/ttyUSB1", baudrate = 9600)
+format_time = '%(asctime)s %(message)s'
+logging.basicConfig(filename='gps_logging.log', level=logging.INFO,format=format_time, datefmt='%m/%d/%Y %I:%M:%S %p')
 
 while True:
     line = gps.readline()
@@ -24,5 +27,11 @@ while True:
             lonmin = longps - londeg*100
             lon = londeg+(lonmin/60)
             
-            print "Latitude: %s" % lat
-            print "Longitude: %s" % lon
+            logging.info(">> Latitude: %s" % lat)
+            logging.info(">> Longitude: %s" % lon)
+
+    if data[0] == "$GPVTG":
+        if data[8] == 'K':
+	    speed = float(data[7])
+
+	logging.info(">> Speed: %s" % speed + " Km/h")
